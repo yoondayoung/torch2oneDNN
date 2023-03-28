@@ -34,6 +34,11 @@
 
 using namespace dnnl;
 
+#ifdef __cplusplus
+extern "C"
+#endif
+void ariel_enable() { printf("Inside Ariel\n"); }
+
 void simple_net(engine::kind engine_kind) {
     using tag = memory::format_tag;
     using dt = memory::data_type;
@@ -440,5 +445,6 @@ void simple_net(engine::kind engine_kind) {
 }
 
 int main(int argc, char **argv) {
+    ariel_enable();
     return handle_example_errors(simple_net, parse_engine_kind(argc, argv));
 }

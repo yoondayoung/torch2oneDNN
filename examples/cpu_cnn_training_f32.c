@@ -34,6 +34,27 @@
 
 #include "example_utils.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+void ariel_enable() { printf("Inside Ariel\n"); }
+void* mlm_malloc(size_t size, int level)
+{
+	if(size == 0)
+      {
+		// printf("ZERO BYTE MALLOC\n");
+		void* bt_entries[64];
+		exit(-1);
+	}
+
+	printf("Performing a mlm Malloc for size %lu\n", size);
+
+	return malloc(size);
+}
+#ifdef __cplusplus
+}
+#endif
+
 #define BATCH 8
 #define IC 3
 #define OC 96
@@ -185,10 +206,10 @@ void simple_net() {
     dnnl_dims_t conv_padding = {CONV_PAD, CONV_PAD};
 
     float *conv_src = net_src;
-    float *conv_weights = (float *)malloc(
-            product(conv_user_weights_sizes, ndims) * sizeof(float));
+    float *conv_weights = (float *)mlm_malloc(
+            product(conv_user_weights_sizes, ndims) * sizeof(float),1);
     float *conv_bias
-            = (float *)malloc(product(conv_bias_sizes, 1) * sizeof(float));
+            = (float *)mlm_malloc(product(conv_bias_sizes, 1) * sizeof(float),1);
 
     init_net_data(conv_weights, ndims, conv_user_weights_sizes);
     init_net_data(conv_bias, 1, conv_bias_sizes);
@@ -541,9 +562,9 @@ void simple_net() {
 
     // Backward convolution with respect to weights
     float *conv_diff_bias_buffer
-            = (float *)malloc(product(conv_bias_sizes, 1) * sizeof(float));
-    float *conv_user_diff_weights_buffer = (float *)malloc(
-            product(conv_user_weights_sizes, 4) * sizeof(float));
+            = (float *)mlm_malloc(product(conv_bias_sizes, 1) * sizeof(float),1);
+    float *conv_user_diff_weights_buffer = (float *)mlm_malloc(
+            product(conv_user_weights_sizes, 4) * sizeof(float),1);
 
     // initialize memory for diff weights in user format
     dnnl_memory_t conv_user_diff_weights_memory;
@@ -774,7 +795,8 @@ void simple_net() {
 }
 
 int main(int argc, char **argv) {
+    ariel_enable();
     simple_net();
     printf("Example passed on CPU.\n");
-    return 0;
+//     return 0;
 }

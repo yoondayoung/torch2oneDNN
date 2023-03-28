@@ -49,6 +49,27 @@
 
 #include "example_utils.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+void ariel_enable() { printf("Inside Ariel\n"); }
+void* mlm_malloc(size_t size, int level)
+{
+	if(size == 0)
+      {
+		// printf("ZERO BYTE MALLOC\n");
+		void* bt_entries[64];
+		exit(-1);
+	}
+
+	printf("Performing a mlm Malloc for size %lu\n", size);
+
+	return malloc(size);
+}
+#ifdef __cplusplus
+}
+#endif
+
 #define BATCH 8
 #define IC 3
 #define OC 96
@@ -198,8 +219,8 @@ void simple_net(dnnl_engine_kind_t engine_kind) {
     dnnl_dims_t conv_padding = {CONV_PAD, CONV_PAD};
 
     float *conv_src = net_src;
-    float *conv_weights = (float *)malloc(
-            product(conv_user_weights_sizes, ndims) * sizeof(float));
+    float *conv_weights = (float *)mlm_malloc(
+            product(conv_user_weights_sizes, ndims) * sizeof(float), 1);
     float *conv_bias
             = (float *)malloc(product(conv_bias_sizes, 1) * sizeof(float));
 
@@ -457,7 +478,7 @@ void simple_net(dnnl_engine_kind_t engine_kind) {
     dnnl_primitive_destroy(conv_reorder_weights);
     dnnl_primitive_destroy(conv);
 
-    free(conv_weights);
+//     free(conv_weights);
     free(conv_bias);
 
     dnnl_memory_destroy(relu_dst_memory);
@@ -478,6 +499,7 @@ void simple_net(dnnl_engine_kind_t engine_kind) {
 
 int main(int argc, char **argv) {
     dnnl_engine_kind_t engine_kind = parse_engine_kind(argc, argv);
+    ariel_enable();
     simple_net(engine_kind);
     printf("Example passed on %s.\n", engine_kind2str_upper(engine_kind));
     return 0;

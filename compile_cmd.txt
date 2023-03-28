@@ -1,0 +1,6 @@
+g++ -I/home/ydy/oneDNN/build/include -I/home/ydy/oneDNN/include -O0 -o inference_test.o -fopenmp -c cnn_inference_f32.c
+g++ -I/home/ydy/oneDNN/build/include -I/home/ydy/oneDNN/include -O0 -o inference_test -fopenmp inference_test.o -L/home/ydy/oneDNN/build/src -ldnnl
+
+
+g++ -I/home/ydy/oneDNN/build/include -I/home/ydy/oneDNN/include -O0 -o training_test.o -fopenmp -c cpu_cnn_training_f32.c
+g++ -I/home/ydy/oneDNN/build/include -I/home/ydy/oneDNN/include -O0 -o training_test -fopenmp training_test.o -L/home/ydy/oneDNN/build/src -ldnnl
